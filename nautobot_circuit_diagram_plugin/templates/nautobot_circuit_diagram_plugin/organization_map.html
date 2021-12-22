@@ -1,0 +1,159 @@
+{% extends 'base.html' %}
+{% load render_table from django_tables2 %}
+{% load buttons %}
+{% load static %}
+{% load helpers %}
+{% load plugins %}
+
+{% block content %}
+<style>
+#map {
+    height: 100%;
+    width: 100%;
+    height: 500px;
+}
+</style> 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+<script>
+    let map;
+    function initMap() {
+        const img =
+        "https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png";
+
+        map = new google.maps.Map(document.getElementById("map"), {
+            center: { lat: 32.7502, lng: 120.7655 },
+            zoom: 1.95,
+        });
+        function GenerateMap(){
+            $.ajax({
+                url: "{% url 'plugins:nautobot_circuit_diagram_plugin:load-sites' %}",
+                success:  function(response){
+                    var markers=[];
+                    var contents = [];
+                    var infowindows = [];
+                    var polylines = [];
+                    var circuit_plotted = [];
+                    var j = 0;
+                    console.log(response[response.length - 1])
+                    
+                    for (const [key_1, value_1] of Object.entries(response[response.length - 1])) {
+                        for (const [key, value] of Object.entries(response)) {
+                            var coord = [];
+                            if ("circuits" in response[key]){
+                                if (value_1 in response[key]["circuits"]){
+                                    for (const [key_2, value_2] of Object.entries(response[key]["circuits"][value_1])) {
+                                        if (key_2 == "status_color") {
+                                            var STROKE_COLOR = value_2
+                                        } else if (key_2 == "status"){
+                                            var status = value_2
+                                        } else {
+                                            if (value_2) {
+                                                coord.push(new google.maps.LatLng(Number(value_2["lat"]), Number(value_2["lng"])));
+                                            }
+                                        }
+                                    }
+                                    if (coord.length == 2 ){
+                                        if (circuit_plotted.includes(value_1)){
+                                            continue;
+                                        }else{
+                                            polylines[j]= new google.maps.Polyline({
+                                                path: coord,
+                                                geodesic: true,
+                                                strokeColor: STROKE_COLOR,
+                                                strokeOpacity: 1.0,
+                                                strokeWeight: 2,
+                                                title: value_1,
+                                                status: status,
+                                            })
+                                            circuit_plotted.push(value_1)
+                                            polylines[j].index = j;
+                                            polylines[j].setMap(map);
+                                            var infowindow = new google.maps.InfoWindow();
+                                            google.maps.event.addListener(polylines[j], 'mouseover', function(event) {
+                                                infowindow.setContent("<b>" + polylines[this.index].title + "</b>" + linebreaks + "<b>Status</b>" + ": " + polylines[this.index].status)
+                                                infowindow.setPosition(event.latLng);
+                                                infowindow.open(map);
+                                            });
+                                            google.maps.event.addListener(polylines[j], 'mouseout', function() {
+                                                infowindow.close(map);
+                                            });
+                                            j += 1;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    var linebreaks = "<br>"
+                    for (i = 0; i < response.length; i++) {
+                        let url = "http://maps.google.com/mapfiles/ms/icons/";
+                        url += response[i]["status"] + "-dot.png";
+                        markers[i] = new google.maps.Marker({
+                            position: new google.maps.LatLng(Number(response[i]["lat"]), Number(response[i]["lng"])),
+                            map: map,
+                            title: response[i]["name"],
+                            circuits: response[i]["circuits"],
+                            address: response[i]["address"],
+                            icon: {url}
+                        });
+                        infowindows[i] = new google.maps.InfoWindow({
+                            content: "<div style=\"height:100%\"></div>",
+                            Width: 100,
+                        });
+                        markers[i].index = i;
+                        infowindows[i].index = i;
+                        google.maps.event.addListener(markers[i], 'click', function() {
+                            map.panTo(markers[this.index].getPosition());
+                        });
+                        google.maps.event.addListener(markers[i], 'mouseover', function() {
+                            var name = markers[this.index].title;
+                            var circuits = markers[this.index].circuits;
+                            var address = markers[this.index].address;
+                            var html = "<b>" + name + "</b>" + linebreaks + "<b> Address</b>: " + address + linebreaks;
+                            for (const [key, value] of Object.entries(circuits)) {
+                                amendment = "<b>" + key + "</b>: " + linebreaks
+                                for (const [key_1, value_1] of Object.entries(circuits[key])) {
+                                    if (key_1!="status" && key_1!="status_color"){
+                                        if (value_1) {
+                                            amendment +=  "<b>" + key_1 + ": </b>"+ value_1["lat"] + ", " + value_1["lng"] + " ";
+                                        } else {
+                                            amendment +=  "<b>" + key_1 + ": </b> Cloud";
+                                        }
+                                    }
+                                }
+                                amendment += linebreaks
+                                html += amendment
+                            }
+                            infowindows[this.index].setContent(html);
+                            infowindows[this.index].open(map, markers[this.index], html);
+                        });
+                        google.maps.event.addListener(markers[i], 'mouseout', function() {
+                            infowindows[this.index].close();
+                        });
+                    }
+                }
+            })
+        }
+        GenerateMap()
+    }
+</script>
+<!-- load the d3.js library -->	
+<div class="row">
+    <div class="col-md-12">
+        <div class="tab-content col-md-12">
+            <div role="tabpanel" class="tab-pane active " id="details">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <strong>Organization Map</strong>
+                    </div>
+                    <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
+                    <div id="map" value="{{coordinates}}"></div>
+                    <script src="https://maps.googleapis.com/maps/api/js?key={{key}}&callback=initMap&v=weekly" async></script>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

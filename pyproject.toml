@@ -1,0 +1,79 @@
+[tool.poetry]
+name = "nautobot-circuit-diagram-plugin"
+version = "0.1.0"
+description = "data visualization for nautobot circuits"
+authors = ["Hanlin Miao"]
+
+[tool.poetry.dependencies]
+python = "^3.6"
+nautobot = "*"
+nautobot-capacity-metrics = "*"
+texttable = "^1.6.2"
+PyJWT = "^2.1.0"
+webexteamssdk = "^1.3"
+slack-sdk = "^3.4.2"
+
+[tool.poetry.dev-dependencies]
+black = "*"
+yamllint = "*"
+bandit = "*"
+pylint = "*"
+pylint-django = "*"
+pydocstyle = "*"
+prybar = "*"
+invoke = "*"
+flake8 = "*"
+
+[tool.black]
+line-length = 120
+target-version = ['py36']
+include = '\.pyi?$'
+exclude = '''
+(
+  /(
+      \.eggs         # exclude a few common directories in the
+    | \.git          # root of the project
+    | \.hg
+    | \.mypy_cache
+    | \.tox
+    | \.venv
+    | _build
+    | buck-out
+    | build
+    | dist
+  )/
+  | settings.py     # This is where you define files that should not be stylized by black
+                     # the root of the project
+)
+'''
+
+[tool.pylint.master]
+# Including the pylint_django plugin
+load-plugins="pylint_django"
+
+[tool.pylint.message_control]
+disable=""",
+    django-not-configured,
+    too-few-public-methods,
+    """
+
+[tool.pylint.miscellaneous]
+notes=""",
+    FIXME,
+    XXX,
+    """
+
+[tool.pylint.design]
+max-args=6
+max-public-methods=22
+
+[tool.pylint.similarities]
+ignore-imports= true
+min-similarity-lines=12
+
+[tool.pylint.format]
+max-line-length=120
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
