@@ -3,7 +3,7 @@ import os
 import sys
 
 from nautobot.core.settings import *  # noqa: F403
-from nautobot.core.settings_funcs import is_truthy
+from nautobot.core.settings_funcs import is_truthy, parse_redis_connection
 
 
 #
@@ -118,7 +118,7 @@ if REDIS_SSL:
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": f"{REDIS_SCHEME}://{REDIS_HOST}:{REDIS_PORT}/0",
+        "LOCATION": parse_redis_connection(redis_database=0),
         "TIMEOUT": 300,
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
@@ -130,7 +130,7 @@ CACHES = {
 # up top via `from nautobot.core.settings import *`.
 
 # Redis Cacheops
-CACHEOPS_REDIS = f"{REDIS_SCHEME}://{REDIS_HOST}:{REDIS_PORT}/1"
+CACHEOPS_REDIS = parse_redis_connection(redis_database=1)
 
 #
 # Celery settings are not defined here because they can be overloaded with

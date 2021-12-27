@@ -1,5 +1,6 @@
 """Views for diagram."""
 import os
+from nautobot_circuit_diagram_plugin.choices import SITE_MAP_CSS_CLASSES, CIRCUIT_MAP_CSS_CLASSES
 from django.shortcuts import render
 from nautobot.dcim.models import Site
 from nautobot.dcim.choices import SiteStatusChoices
@@ -26,7 +27,7 @@ def load_site_coordinates(request):
             data["address"] = site.physical_address if site.physical_address else "N/A"
             data["lat"] = site.latitude
             data["lng"] = site.longitude
-            data["status"] = SiteStatusChoices.MAP_CSS_CLASSES[site.get_status_display()]
+            data["status"] = SITE_MAP_CSS_CLASSES[site.get_status_display()]
             data["circuits"] = {}
             circuit_terms = CircuitTermination.objects.filter(site=site)
             circuits = Circuit.objects.filter(terminations__in=circuit_terms)
@@ -35,7 +36,7 @@ def load_site_coordinates(request):
                     circuit_set.append(str(circuit))
                 data["circuits"][str(circuit)] = {}
                 data["circuits"][str(circuit)]["status"] = circuit.get_status_display()
-                data["circuits"][str(circuit)]["status_color"] = CircuitStatusChoices.MAP_CSS_CLASSES[circuit.get_status_display()]
+                data["circuits"][str(circuit)]["status_color"] = CIRCUIT_MAP_CSS_CLASSES[circuit.get_status_display()]
                 data["circuits"][str(circuit)]["A"] = {}
                 data["circuits"][str(circuit)]["Z"] = {}
                 if not circuit.termination_a:
