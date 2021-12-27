@@ -8,12 +8,18 @@ A data visualization tool for nautobot sites and circuits.
 ### Step 1
 Enter site coordinates using site edit form:
 
+![alt text](https://github.com/HanlinMiao/nautobot-circuit-diagram-plugin/blob/main/media/site_edit_form.png)
+
 ### Step 2
 Go to the Circuits dropdown at Nautobot homepage and click on Diagram.
 
+![alt text](https://github.com/HanlinMiao/nautobot-circuit-diagram-plugin/blob/main/media/navigation.png)
 
 ### Step 3
 Sites and their circuits are plotted on Google Map.
 
+![alt text](https://github.com/HanlinMiao/nautobot-circuit-diagram-plugin/blob/main/media/demo.png)
+
 ## See it in action
 
+![alt text](https://github.com/HanlinMiao/nautobot-circuit-diagram-plugin/blob/main/media/meta_data.png)
