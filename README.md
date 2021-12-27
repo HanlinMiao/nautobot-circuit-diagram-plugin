@@ -12,6 +12,7 @@ Enter site coordinates using site edit form:
 
 ### Step 2
 Go to the Circuits dropdown at Nautobot homepage and click on Diagram.
+Alternatively, you can go to the Plugins dropdown and click on global-diagram.
 
 ![alt text](https://github.com/HanlinMiao/nautobot-circuit-diagram-plugin/blob/main/media/navigation.png)
 
