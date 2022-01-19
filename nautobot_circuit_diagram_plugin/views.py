@@ -3,9 +3,7 @@ import os
 from nautobot_circuit_diagram_plugin.choices import SITE_MAP_CSS_CLASSES, CIRCUIT_MAP_CSS_CLASSES
 from django.shortcuts import render
 from nautobot.dcim.models import Site
-from nautobot.dcim.choices import SiteStatusChoices
 from nautobot.circuits.models import CircuitTermination, Circuit
-from nautobot.circuits.choices import CircuitStatusChoices
 from django.conf import settings
 from django.http import JsonResponse
 import random
