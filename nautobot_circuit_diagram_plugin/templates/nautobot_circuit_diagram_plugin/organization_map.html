@@ -12,10 +12,14 @@
     width: 100%;
     height: 500px;
 }
-</style> 
+</style>
 <script>
     let map;
-    function initMap() {
+    var geodesic_status;
+    function initMap(geodesic_status) {
+        if (geodesic_status==undefined){
+            geodesic_status = true;
+        }
         map = new google.maps.Map(document.getElementById("map"), {
             center: { lat: 32.7502, lng: 120.7655 },
             zoom: 1.95,
@@ -29,9 +33,7 @@
                     var infowindows = [];
                     var polylines = [];
                     var circuit_plotted = [];
-                    var j = 0;
-                    console.log(response[response.length - 1])
-                    
+                    var j = 0;                    
                     for (const [key_1, value_1] of Object.entries(response[response.length - 1])) {
                         for (const [key, value] of Object.entries(response)) {
                             var coord = [];
@@ -54,7 +56,7 @@
                                         }else{
                                             polylines[j]= new google.maps.Polyline({
                                                 path: coord,
-                                                geodesic: true,
+                                                geodesic: geodesic_status,
                                                 strokeColor: STROKE_COLOR,
                                                 strokeOpacity: 1.0,
                                                 strokeWeight: 2,
@@ -132,6 +134,15 @@
         }
         GenerateMap()
     }
+    function toggle() {
+        if (geodesic_status == true || geodesic_status == undefined){
+            geodesic_status = false;
+            initMap(geodesic_status);
+        }else{
+            geodesic_status = true;
+            initMap(geodesic_status);
+        }
+    }
 </script>
 <!-- load the d3.js library -->	
 <div class="row">
@@ -141,6 +152,7 @@
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         <strong>Organization Map</strong>
+                        <button class="btn-success pull-right" onclick="toggle()">Geodesic</button>
                     </div>
                     <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
                     <div id="map" value="{{coordinates}}"></div>
